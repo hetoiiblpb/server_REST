@@ -1,0 +1,57 @@
+create table users
+(
+	id BIGINT auto_increment comment 'Id юзера Автоувелич, не ноль первичный ключ',
+	username VARCHAR(100) not null comment 'Логин , не ноль, уник',
+	email VARCHAR(255) not null comment 'Почта, не ноль, уник',
+	first_name VARCHAR(100) not null comment 'Имя юзера, не ноль',
+	last_name VARCHAR(100) not null comment 'Фамилия пользователя, не ноль',
+	password VARCHAR(255) not null comment 'пароль, не ноль',
+    created TIMESTAMP default CURRENT_TIMESTAMP not null comment 'создано, время',
+    updated TIMESTAMP default CURRENT_TIMESTAMP not null comment 'изменено, время',
+    status VARCHAR(25) default 'ACTIVE' not null comment 'статус, не ноль , короткий',
+
+    constraint users_pk
+		primary key (id)
+)
+comment 'users table';
+
+create unique index users_email_uindex
+	on users (email);
+
+create unique index users_username_uindex
+	on users (username);
+
+create table roles
+(
+    id      BIGINT auto_increment comment 'Id роли Автоувелич, не ноль первичный ключ',
+    name    VARCHAR(100)                          not null comment 'Назв роли, не ноль, уник',
+    created TIMESTAMP   default CURRENT_TIMESTAMP not null comment 'создано, время',
+    updated TIMESTAMP   default CURRENT_TIMESTAMP not null comment 'изменено, время',
+    status  VARCHAR(25) default 'ACTIVE'          not null comment 'статус, не ноль , короткий',
+
+    constraint roles_pk
+        primary key (id)
+)
+comment 'roles table';
+
+create unique index roles_name_uindex
+    on roles (name);
+
+create table user_roles
+(
+    user_id BIGINT comment 'Id юзера ',
+    role_id BIGINT comment 'Id роли ',
+
+    constraint user_roles_pk primary key (user_id, role_id),
+
+    constraint fk_user_roles_users
+        foreign key (user_id) references users_rest.users (id) on delete cascade on update restrict ,
+
+    constraint fk_user_roles_roles
+        foreign key (role_id) references users_rest.roles(id) on delete cascade on update restrict
+)
+comment 'таблица связи юзеров с ролями по Id обоих';
+
+insert into users_rest.roles(name) value('ROLE_USER');
+insert into users_rest.roles(name) value('ROLE_ADMIN');
+
